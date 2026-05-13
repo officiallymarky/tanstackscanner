@@ -2,7 +2,7 @@
 
 A small Bash scanner for indicators of compromise related to the TanStack npm supply-chain compromise and Mini Shai-Hulud activity.
 
-The scanner checks for known suspicious files, dependency indicators, persistence artifacts, and running processes associated with the campaign.
+The scanner checks for known suspicious files, dependency indicators, Git hook indicators, persistence artifacts, and running processes associated with the campaign.
 
 ## What it checks
 
@@ -19,6 +19,7 @@ The scanner checks for known suspicious files, dependency indicators, persistenc
   - `github:tanstack/router`
   - `79ac49eedf774dd4b0cfa308722bc463cfe5885c`
 - User-level persistence artifacts for `gh-token-monitor`
+- Non-sample Git hooks containing threat-specific IOC strings
 - Running processes matching known IOC names
 
 ## Usage
