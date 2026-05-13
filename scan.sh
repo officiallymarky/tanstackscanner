@@ -141,6 +141,21 @@ scan_persistence() {
     done
 }
 
+scan_git_hooks() {
+    echo "→ Checking Git hooks for TanStack/Mini Shai-Hulud IOCs..."
+    while IFS= read -r -d '' file; do
+        if grep -aEq "@tanstack/setup|${MALICIOUS_COMMIT}|github:tanstack/router|router_init\.js|router_runtime\.js|tanstack_runner\.js|gh-token-monitor" "$file" 2>/dev/null; then
+            warn "WARNING: suspicious Git hook IOC in $file"
+            grep -anE "@tanstack/setup|${MALICIOUS_COMMIT}|github:tanstack/router|router_init\.js|router_runtime\.js|tanstack_runner\.js|gh-token-monitor" "$file" 2>/dev/null | head -20
+            echo "-----------------------------------"
+        fi
+    done < <(
+        find "$PWD" "$HOME" \
+            \( -path '*/node_modules/*' -o -path '*/.npm/*' -o -path '*/.pnpm-store/*' -o -path '*/proc/*' -o -path '*/sys/*' -o -path '*/dev/*' \) -prune -o \
+            -type f -path '*/.git/hooks/*' ! -name '*.sample' -print0 2>/dev/null
+    )
+}
+
 scan_running_processes() {
     echo "→ Checking running processes for known IOC names..."
     if pgrep -af 'router_init\.js|router_runtime\.js|tanstack_runner\.js|gh-token-monitor'; then
@@ -151,6 +166,7 @@ scan_running_processes() {
 scan_named_iocs
 scan_manifests
 scan_persistence
+scan_git_hooks
 scan_running_processes
 
 if [[ "$found" == true ]]; then
